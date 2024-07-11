@@ -115,27 +115,34 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
         $checksum = isset( $_POST['checksum'] ) ? $_POST['checksum'] : NULL;
 
         if( empty( $encoded ) || empty( $checksum ) ) {
-            wp_die( 'Invalid request', 400 );
+            echo 'STATUS=ERR:ERR=INVALID CHECKSUM';
+            exit;
         }
 
         if( hash_hmac( 'sha1', $encoded, $this->secret ) !== $checksum ) {
-            wp_die( 'Invalid checksum', 400 );
+            echo 'STATUS=ERR:ERR=INVALID CHECKSUM';
+            exit;
         }
 
         $data = $this->parse_request( $encoded );
 
         if( $data['STATUS'] !== 'PAID' ) {
-            wp_die( 'Invalid status', 400 );
+            echo 'STATUS=ERR:ERR=INVALID STATUS';
+            exit;
         }
 
         $order = $this->get_order_by_invoice( $data['INVOICE'] );
 
         if( empty( $order ) ) {
-            wp_die( 'Order not found', 400 );
+            echo 'STATUS=ERR:ERR=INVALID ORDER';
+            exit;
         }
 
         $order->add_order_note( __( 'Order payment confirmed automatically via EasyPay', 'wc-easypay' ) );
         $order->payment_complete();
+
+        printf( 'INVOICE=%s:STATUS=OK', $data['INVOICE'] );
+        exit;
     }
 
     private function parse_request( $encoded ) {
