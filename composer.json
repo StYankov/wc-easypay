@@ -1,0 +1,16 @@
+{
+    "name": "skills/wc-easypay",
+    "type": "wordpress-plugin",
+    "autoload": {
+        "psr-4": {
+            "Skills\\WcEasypay\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "StYankov",
+            "email": "st.yankov00@gmail.com"
+        }
+    ],
+    "require": {}
+}
