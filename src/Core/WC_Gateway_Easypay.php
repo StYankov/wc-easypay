@@ -126,8 +126,15 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
 
         $data = $this->parse_request( $encoded );
 
+        error_log( json_encode( $data, JSON_PRETTY_PRINT ) );
+
         if( $data['STATUS'] !== 'PAID' ) {
             echo 'STATUS=ERR:ERR=INVALID STATUS';
+            exit;
+        }
+
+        if( empty( $data['INVOICE'] ) ) {
+            echo 'STATUS=ERR:ERR=INVALID INVOICE';
             exit;
         }
 
