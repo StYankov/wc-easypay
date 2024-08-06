@@ -114,8 +114,6 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
         $encoded  = isset( $_POST['encoded'] ) ? $_POST['encoded'] : NULL;
         $checksum = isset( $_POST['checksum'] ) ? $_POST['checksum'] : NULL;
 
-        error_log( json_encode( $_POST, JSON_PRETTY_PRINT ) );
-
         if( empty( $encoded ) || empty( $checksum ) ) {
             echo 'STATUS=ERR:ERR=INVALID CHECKSUM';
             exit;
@@ -176,8 +174,10 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
         $orders = wc_get_orders( [
             'limit'      => 1,
             'meta_query' => [
-                'key'   => '_easypay_invoice_id',
-                'value' => $invoice_id
+                [
+                    'key'   => '_easypay_invoice_id',
+                    'value' => $invoice_id
+                ]
             ]
         ] );
 
