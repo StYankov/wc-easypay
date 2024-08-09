@@ -11,10 +11,17 @@ final class Plugin {
         $this->init();
 
         add_action( 'init', [ $this, 'load_textdomain' ] );
+        add_action( 'wp_log_init', [ $this, 'register_logger' ] );
     }
     
     public function init() {
         new Core\Bootstrap();
+    }
+
+    public function register_logger() {
+        wp_log()->add_logger(
+            \WPLog\Plugin::create_file_logger( 'easypay', 'easypay.log' )
+        );
     }
 
     public function load_textdomain() {

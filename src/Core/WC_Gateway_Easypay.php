@@ -126,6 +126,9 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
 
         $data = $this->parse_request( $encoded );
 
+        $this->log( 'Receiving webhook request', $data );
+        $this->log( 'Original Request', [ 'encoded' => $encoded, 'checksum' => $checksum ] );
+
         error_log( json_encode( $data, JSON_PRETTY_PRINT ) );
 
         if( $data['STATUS'] !== 'PAID' ) {
@@ -145,10 +148,17 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
             exit;
         }
 
-        $order->add_order_note( __( 'Order payment confirmed automatically via EasyPay', 'wc-easypay' ) );
-        $order->payment_complete();
+        $this->log( 'Order found and to be labeled as paid', [ 'OrderId' => $order->get_id() ] );
 
-        printf( 'INVOICE=%s:STATUS=OK', $data['INVOICE'] );
+        $order->add_order_note( sprintf( 'DEBUG EASYPAY: Order should be conformed by webhook. Invoice ID: %s', $data['INVOICE'] ) );
+
+        // $order->add_order_note( __( 'Order payment confirmed automatically via EasyPay', 'wc-easypay' ) );
+        // $order->payment_complete();
+
+        if( rand( 0, 3 ) === 2 ) {
+            printf( 'INVOICE=%s:STATUS=OK', $data['INVOICE'] );
+        }
+
         exit;
     }
 
@@ -171,6 +181,8 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
      * @return \WC_Order|null
      */
     private function get_order_by_invoice( $invoice_id ) {
+        $this->log( 'Searching for order by invoice', [ 'invoice_id' => $invoice_id ] );
+
         $orders = wc_get_orders( [
             'limit'      => 1,
             'meta_query' => [
@@ -181,10 +193,22 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
             ]
         ] );
 
+        $this->log( 'Found orders', $orders );
+
         if( empty( $orders ) ) {
             return NULL;
         }
 
         return $orders[0];
+    }
+
+    private function log( $message, $context ) {
+        if( false === function_exists( 'wp_log' ) ) {
+            return;
+        }
+
+        try {
+            wp_log()->logger( 'easypay' )->info( $message, $context );
+        } catch(Exception $e) {}
     }
 }
