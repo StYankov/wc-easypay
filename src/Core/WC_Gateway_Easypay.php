@@ -129,8 +129,6 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
         $this->log( 'Receiving webhook request', $data );
         $this->log( 'Original Request', [ 'encoded' => $encoded, 'checksum' => $checksum ] );
 
-        error_log( json_encode( $data, JSON_PRETTY_PRINT ) );
-
         if( $data['STATUS'] !== 'PAID' ) {
             echo 'STATUS=ERR:ERR=INVALID STATUS';
             exit;
@@ -185,12 +183,8 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
 
         $orders = wc_get_orders( [
             'limit'      => 1,
-            'meta_query' => [
-                [
-                    'key'   => '_easypay_invoice_id',
-                    'value' => $invoice_id
-                ]
-            ]
+            'meta_key'   => '_easypay_invoice_id',
+            'meta_value' => $invoice_id
         ] );
 
         $this->log( 'Found orders', $orders );
