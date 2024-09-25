@@ -148,14 +148,10 @@ class WC_Gateway_Easypay extends WC_Payment_Gateway {
 
         $this->log( 'Order found and to be labeled as paid', [ 'OrderId' => $order->get_id() ] );
 
-        $order->add_order_note( sprintf( 'DEBUG EASYPAY: Order should be conformed by webhook. Invoice ID: %s', $data['INVOICE'] ) );
+        $order->add_order_note( __( 'Order payment confirmed automatically via EasyPay', 'wc-easypay' ) );
+        $order->payment_complete();
 
-        // $order->add_order_note( __( 'Order payment confirmed automatically via EasyPay', 'wc-easypay' ) );
-        // $order->payment_complete();
-
-        if( rand( 0, 3 ) === 2 ) {
-            printf( 'INVOICE=%s:STATUS=OK', $data['INVOICE'] );
-        }
+        printf( 'INVOICE=%s:STATUS=OK', $data['INVOICE'] );
 
         exit;
     }
