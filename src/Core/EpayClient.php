@@ -16,7 +16,7 @@ class EpayClient {
             'email'    => get_bloginfo( 'admin_email' ),
             'invoice'  => $invoice_id,
             'amount'   => $order->get_total(),
-            'currency' => 'BGN',
+            'currency' => $order->get_currency(),
             'exp_time' => date( 'd.m.Y', strtotime( '+7 days' ) ),
             'DESCR'    => sprintf( 'Order #%s', $order->get_id() ),
             'ENCODING' => 'UTF-8',
